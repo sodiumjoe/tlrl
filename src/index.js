@@ -1,63 +1,33 @@
-import {
-  // first,
-  isEmpty,
-  // last,
-  map,
-  reduce
-} from 'lodash';
-import { prompt, Separator } from 'inquirer';
-import { getFavs, unFav } from './twitter.js';
+#! /usr/bin/env node
+
+import { each, map } from 'lodash';
+import yargs from 'yargs';
 
 import { error } from './utils.js';
+import { parse } from './readability.js';
+import { send } from './kindle.js';
 
-// import { write , newestId, oldestId } from './config';
+const argv = yargs
+  .env('TLRL')
+  .version()
+  .alias('V', 'version')
+  .wrap(null)
+  .boolean('t')
+  .alias('twitter')
+  .count('v')
+  .alias('v', 'verbose')
+  .argv;
 
-// @TODO use since_id from config, run recursively
-getFavs().then(favs => {
+const urls = argv._;
 
-  const choices = reduce(favs, (memo, fav) => {
+argv.v && console.log('url(s): ');
+argv.v && each(urls, url => console.log(url));
 
-    const {
-      id_str: id,
-      text,
-      entities: { urls }
-    } = fav;
-
-    return isEmpty(urls)
-    ? memo
-    : memo.concat(reduce(urls, (memo, { expanded_url }) => memo.concat([{
-      name: text.replace(/(\r\n|\n|\r)/gm,' '),
-      disabled: ' '
-    }, {
-      name: expanded_url,
-      value: { expanded_url, id }
-    }]), [])).concat(new Separator(' '));
-
-  }, [new Separator(), new Separator(), new Separator()]);
-
-  const questions = [{
-    type: 'checkbox',
-    name: 'unfavs',
-    message: 'too long; read later',
-    choices,
-    pageSize: Math.min(process.stdout.rows, choices.length)
-  }];
-
-  prompt(questions).then(({ unfavs }) => {
-    // @TODO readability/parse urls
-    // @TODO make html documents
-    // @TODO write to /tmp
-    // @TODO send to kindle
-    // unfav selections
-    return Promise.all(map(unfavs, ({ id }) => unFav({ id })));
-    // @TODO write first/last from unfavs to config
-    // const config = {
-    //   newestId: first(favs).id,
-    //   oldestId: last(favs).id
-    // };
-    // write(config).then(() => console.log('done')).catch(error);
-  })
-  .then(() => console.log('done'))
-  .catch(error);
-
-});
+Promise.all(map(urls, url => parse(url).then(filename => {
+  argv.v && console.log(`parsed ${url} saved to ${filename}`);
+  return filename;
+}))).then(filenames => {
+  argv.v && console.log('sending to kindle:');
+  argv.v && each(filenames, f => console.log(f));
+  return send(filenames);
+}).catch(error);
