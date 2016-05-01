@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src --out-dir lib",
-    "prepublish": "in-publish && npm run build"
+    "prepublish": "in-publish && npm run build || true"
   },
   "author": "Joe Moon <joe@xoxomoon.com>",
   "repository": "git@github.com:sodiumjoe/tlrl.git",
