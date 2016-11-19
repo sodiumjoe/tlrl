@@ -7,7 +7,7 @@ let config = require(file);
 
 export const getConfig = () => config;
 
-export const { twitter, readability, mailgun } = getConfig();
+export const { twitter, mercury, mailgun } = getConfig();
 
 export const write = params => {
   const newConfig = merge({}, getConfig(), params);

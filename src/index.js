@@ -4,7 +4,7 @@ import { each, map } from 'lodash';
 import yargs from 'yargs';
 
 import { error } from './utils.js';
-import { parse } from './readability.js';
+import { parse } from './mercury.js';
 import { send } from './kindle.js';
 
 const argv = yargs

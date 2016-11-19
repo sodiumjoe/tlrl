@@ -1,34 +1,36 @@
 import { property } from 'lodash';
 import { promisify, promisifyAll } from 'bluebird';
-import { stringify } from 'querystring';
 const request = promisify(require('request'));
 const { writeFileAsync } = promisifyAll(require('fs'));
-import { readability } from './config.js';
+import { mercury } from './config.js';
 
 const {
   token,
   tmpDir
-} = readability;
+} = mercury;
 
-const baseUrl = 'https://www.readability.com/api/content/v1/parser';
+const baseUrl = 'https://mercury.postlight.com/parser';
 
-export const parse = url => {
-  const params = stringify({ url, token });
-  return request(`${baseUrl}?${params}`)
-  .then(property('body'))
-  .then(JSON.parse)
-  .then(body => {
-    const content = makeDocument(body);
-    const {
-      title,
-      author,
-      domain
-    } = body;
-    const fileName = `${tmpDir}/${title} - ${author} - ${domain}.html`;
-    return writeFileAsync(fileName, content)
-    .then(() => fileName);
-  });
-};
+export const parse = url => request({
+  url: `${baseUrl}?url=${url}`,
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': token
+  }
+})
+.then(property('body'))
+.then(JSON.parse)
+.then(body => {
+  const content = makeDocument(body);
+  const {
+    title,
+    author,
+    domain
+  } = body;
+  const fileName = `${tmpDir}/${title} - ${author} - ${domain}.html`;
+  return writeFileAsync(fileName, content)
+  .then(() => fileName);
+});
 
 function makeDocument({
   title,

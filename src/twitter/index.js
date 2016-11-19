@@ -12,7 +12,7 @@ import { prompt, Separator } from 'inquirer';
 import { getNewFavs, getOldFavs, unFav } from './api.js';
 
 import { error } from '../utils.js';
-import { parse } from './readability.js';
+import { parse } from './mercury.js';
 import { send } from './kindle.js';
 
 const IGNORED_HOSTNAMES = [
