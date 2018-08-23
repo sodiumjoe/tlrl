@@ -1,22 +1,23 @@
 import { assign, map } from 'lodash';
 import { createReadStream } from 'fs';
-import { post } from 'request';
-import { mailgun } from './config.js';
+import { mailgun as config } from './config.js';
+import mailgun from 'mailgun.js';
 
 const {
-    auth,
-    email
-} = mailgun;
+  auth: key,
+  email
+} = config;
 
-const url = 'https://api.mailgun.net/v3/mg.xoxomoon.com/messages';
+const mg = mailgun.client({ username: 'api', key });
 
-export const send = filenames =>
-  Promise.all(map(filenames, filename => new Promise((resolve, reject) => {
-    post({
-      url,
-      auth,
-      formData: assign({}, email, {
-        attachment: createReadStream(filename)
-      })
-    }, err => err ? reject(err) : resolve());
-  })));
+export const send = (filenames, verbose) =>
+  Promise.all(map(filenames, filename => {
+    verbose && console.log({ key, email });
+    return mg.messages.create('mg.xoxomoon.com', assign({}, email, {
+      subject: 'tl;rl',
+      attachment: [createReadStream(filename)],
+      text: 'article'
+    }))
+      .then(() => verbose && console.log(`sent: ${filename}`))
+      .catch(console.error.bind(console));
+  }));

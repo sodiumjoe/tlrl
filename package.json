@@ -1,6 +1,6 @@
 {
   "name": "tlrl",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "send to kindle",
   "main": "index.js",
   "scripts": {
@@ -29,6 +29,7 @@
     "in-publish": "^2.0.0",
     "inquirer": "^1.0.0",
     "lodash": "^4.9.0",
+    "mailgun.js": "^2.0.1",
     "request": "^2.70.0",
     "twitter": "^1.2.5",
     "yargs": "^4.6.0"

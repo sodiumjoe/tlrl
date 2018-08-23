@@ -29,5 +29,5 @@ Promise.all(map(urls, url => parse(url).then(filename => {
 }))).then(filenames => {
   argv.v && console.log('sending to kindle:');
   argv.v && each(filenames, f => console.log(f));
-  return send(filenames);
+  return send(filenames, argv.v);
 }).catch(error);
