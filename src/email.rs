@@ -24,7 +24,8 @@ pub fn send(doc: ParsedDocument, config: EmailConfig) -> Result<(), Error> {
         date_published,
     } = doc;
 
-    let mut mailer = SmtpClient::new_simple("smtp.gmail.com")?
+    let mut mailer = SmtpClient::new_simple("smtp.gmail.com")
+        .map_err(|err| format_err!("Error creating mail client: {}", err))?
         .credentials(Credentials::new(username.to_owned(), password))
         .transport();
 
@@ -51,15 +52,19 @@ pub fn send(doc: ParsedDocument, config: EmailConfig) -> Result<(), Error> {
         .subject("CONVERT")
         .text("Sent from tl;rl")
         .attachment(&content.into_bytes(), file_name.as_str(), &TEXT_HTML)?
-        .build()?;
+        .build()
+        .map_err(|err| format_err!("Error building email: {}", err))?;
 
     trace!("{:?}", email);
 
-    trace!("sending...");
-    mailer.send(email.into())?;
-    trace!("sent");
-    trace!("closing...");
+    trace!("sending email...");
+    mailer
+        .send(email.into())
+        .map_err(|err| format_err!("Error sending email: {}", err))?;
+    trace!("email sent");
+
+    trace!("closing mailer...");
     mailer.close();
-    trace!("closed");
+    trace!("mailer closed");
     Ok(())
 }

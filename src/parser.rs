@@ -27,10 +27,15 @@ pub fn parse(uri: &str, key: String) -> Result<ParsedDocument, Error> {
     req.header(XApiKey(key.to_string()));
     // TODO: redact api key
     debug!("{:?}", req);
-    let mut res = req.send()?;
+    let mut res = req
+        .send()
+        .map_err(|err| format_err!("Error sending request to mercury api: {}", err))?;
     debug!("{:?}", res);
-    let text = res.text()?;
+    let text = res
+        .text()
+        .map_err(|err| format_err!("Error getting text from mercury api response: {}", err))?;
     debug!("{:?}", text);
-    let json: ParsedDocument = serde_json::from_str(text.as_str())?;
+    let json: ParsedDocument = serde_json::from_str(text.as_str())
+        .map_err(|err| format_err!("Error deserializing mercury api response json: {}", err))?;
     Ok(json)
 }

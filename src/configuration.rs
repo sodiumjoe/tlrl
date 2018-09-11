@@ -1,4 +1,5 @@
-use config::{Config, ConfigError, File};
+use config::{Config, File};
+use failure::{err_msg, Error};
 use std::env::home_dir;
 
 #[derive(Debug, Deserialize)]
@@ -10,16 +11,16 @@ pub struct Configuration {
 }
 
 impl Configuration {
-    pub fn new() -> Result<Self, ConfigError> {
+    pub fn new() -> Result<Self, Error> {
         let mut s = Config::new();
-        let mut config_file_path = home_dir().unwrap();
+        let mut config_file_path = home_dir().ok_or(err_msg("Couldn't find home dir"))?;
         config_file_path.push(".tlrl.json");
 
         s.merge(File::from(config_file_path))?;
 
         info!("config: {:?}", s);
 
-        s.try_into()
+        Ok(s.try_into()?)
     }
 
     pub fn get_mercury_token(&self) -> String {

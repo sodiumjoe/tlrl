@@ -4,12 +4,13 @@ extern crate log;
 extern crate serde_derive;
 #[macro_use]
 extern crate hyper;
+#[macro_use]
+extern crate failure;
 
 extern crate chrono;
 extern crate clap;
 extern crate config;
 extern crate env_logger;
-extern crate failure;
 extern crate lettre;
 extern crate lettre_email;
 extern crate mime;
@@ -58,7 +59,8 @@ fn main() -> Result<(), Error> {
     let env = env_logger::Env::default().filter_or(env_logger::DEFAULT_FILTER_ENV, log_level);
     env_logger::Builder::from_env(env).init();
 
-    let config = Configuration::new()?;
+    let config =
+        Configuration::new().map_err(|error| format_err!("Configuration error: {}", error))?;
     let url = matches.value_of("url").unwrap();
 
     let doc = parser::parse(url, config.get_mercury_token())?;
