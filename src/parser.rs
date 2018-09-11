@@ -25,8 +25,8 @@ pub fn parse(uri: &str, key: String) -> Result<ParsedDocument, Error> {
 
     let mut req = client.get(request_uri.as_str());
     req.header(XApiKey(key.to_string()));
-    // TODO: redact api key
-    debug!("{:?}", req);
+    let req_string = format!("{:?}", req).as_str().replace(&key, "[redacted]");
+    debug!("{}", req_string);
     let mut res = req
         .send()
         .map_err(|err| format_err!("Error sending request to mercury api: {}", err))?;

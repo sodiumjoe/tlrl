@@ -2,7 +2,7 @@ use config::{Config, File};
 use failure::{err_msg, Error};
 use std::env::home_dir;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Configuration {
     kindle_email: String,
     gmail_username: String,
@@ -12,15 +12,23 @@ pub struct Configuration {
 
 impl Configuration {
     pub fn new() -> Result<Self, Error> {
-        let mut s = Config::new();
+        let mut result = Config::new();
         let mut config_file_path = home_dir().ok_or(err_msg("Couldn't find home dir"))?;
         config_file_path.push(".tlrl.json");
 
-        s.merge(File::from(config_file_path))?;
+        result.merge(File::from(config_file_path))?;
 
-        info!("config: {:?}", s);
+        let result: Configuration = result.try_into()?;
 
-        Ok(s.try_into()?)
+        let logged_config = Configuration {
+            gmail_application_password: "[redacted]".into(),
+            mercury_token: "[redacted]".into(),
+            ..result.clone()
+        };
+
+        info!("config: {:?}", logged_config);
+
+        Ok(result)
     }
 
     pub fn get_mercury_token(&self) -> String {
