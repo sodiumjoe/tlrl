@@ -1,0 +1,21 @@
+[package]
+name = "tlrl"
+version = "0.1.0"
+authors = ["Joe Moon <joe@xoxomoon.com>"]
+
+[dependencies]
+chrono = "0.4"
+clap = "2.32"
+config = "0.9"
+env_logger = "0.5"
+failure = "0.1"
+failure_derive = "0.1"
+hyper = "0.11"
+lettre = { git = "https://github.com/lettre/lettre", rev = "e225afbec291bd319a703217dad43ecfcc6a1cd2" }
+lettre_email = { git = "https://github.com/lettre/lettre", rev = "e225afbec291bd319a703217dad43ecfcc6a1cd2" }
+log = "0.4"
+mime = "0.3"
+reqwest = "0.8"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
