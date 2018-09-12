@@ -17,7 +17,7 @@ Send a web page to your kindle for reading later from the command line.
   * -> Send-to-Kindle E-Mail Settings
 4. Make sure you have a kindle approved sender email address.
   * -> Approved Personal Document E-mail List
-5. Create a `~.tlrl.json` file:
+5. Create a `~/.tlrl.json` file:
 
 ```json
 {
