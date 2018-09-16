@@ -22,6 +22,7 @@ pub fn send(doc: ParsedDocument, config: EmailConfig) -> Result<(), Error> {
         content,
         domain,
         date_published,
+        url,
     } = doc;
 
     let content = format!(
@@ -56,8 +57,8 @@ pub fn send(doc: ParsedDocument, config: EmailConfig) -> Result<(), Error> {
     let email = EmailBuilder::new()
         .to(to)
         .from(username)
-        .subject("CONVERT")
-        .text("Sent from tl;rl")
+        .subject("convert")
+        .text(format!("Sent from tl;rl: {}", url.unwrap_or("".into())))
         .attachment(&content.into_bytes(), file_name.as_str(), &TEXT_HTML)?
         .build()
         .map_err(|err| format_err!("Error building email: {}", err))?;

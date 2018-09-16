@@ -13,6 +13,7 @@ pub struct ParsedDocument {
     pub content: String,
     pub domain: Option<String>,
     pub date_published: Option<String>,
+    pub url: Option<String>,
 }
 
 pub fn parse(uri: &str, key: String) -> Result<ParsedDocument, Error> {
