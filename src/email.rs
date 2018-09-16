@@ -24,6 +24,13 @@ pub fn send(doc: ParsedDocument, config: EmailConfig) -> Result<(), Error> {
         date_published,
     } = doc;
 
+    let content = format!(
+        "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"/><title>{}</title></head><body><h1>{}</h1>{}</body></html>",
+        title,
+        title,
+        content
+    );
+
     let mut mailer = SmtpClient::new_simple("smtp.gmail.com")
         .map_err(|err| format_err!("Error creating mail client: {}", err))?
         .credentials(Credentials::new(username.to_owned(), password))
