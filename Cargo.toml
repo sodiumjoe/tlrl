@@ -11,8 +11,8 @@ env_logger = "0.5"
 failure = "0.1"
 failure_derive = "0.1"
 hyper = "0.11"
-lettre = { git = "https://github.com/lettre/lettre", rev = "e225afbec291bd319a703217dad43ecfcc6a1cd2" }
-lettre_email = { git = "https://github.com/lettre/lettre", rev = "e225afbec291bd319a703217dad43ecfcc6a1cd2" }
+lettre = { git = "https://github.com/lettre/lettre", rev = "master" }
+lettre_email = { git = "https://github.com/lettre/lettre", rev = "master" }
 log = "0.4"
 mime = "0.3"
 reqwest = "0.8"
