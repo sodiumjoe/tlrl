@@ -7,10 +7,13 @@ extern crate hyper;
 #[macro_use]
 extern crate failure;
 
+extern crate base64;
 extern crate chrono;
 extern crate clap;
 extern crate config;
 extern crate env_logger;
+extern crate html5ever;
+extern crate image;
 extern crate lettre;
 extern crate lettre_email;
 extern crate mime;
@@ -37,15 +40,13 @@ fn main() -> Result<(), Error> {
                 .help("The url of the webpage.")
                 .required(true)
                 .index(1),
-        )
-        .arg(
+        ).arg(
             Arg::with_name("v")
                 .short("v")
                 .long("verbose")
                 .multiple(true)
                 .help("Sets the level of verbosity"),
-        )
-        .get_matches();
+        ).get_matches();
 
     let log_level = match matches.occurrences_of("v") {
         0 => "error",
