@@ -1,6 +1,6 @@
 use config::{Config, File};
+use dirs::home_dir;
 use failure::{err_msg, Error};
-use std::env::home_dir;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Configuration {

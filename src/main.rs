@@ -11,6 +11,7 @@ extern crate base64;
 extern crate chrono;
 extern crate clap;
 extern crate config;
+extern crate dirs;
 extern crate env_logger;
 extern crate html5ever;
 extern crate image;
