@@ -49,7 +49,11 @@ pub fn parse(uri: &str, key: String) -> Result<ParsedDocument, Error> {
     let mut json: ParsedDocument = serde_json::from_str(text.as_str())
         .map_err(|err| format_err!("Error deserializing mercury api response json: {}", err))?;
 
+    debug!("content: {:?}", json.content);
+
     json.content = inline_images(json.content)?;
+    debug!("content with inlined images: {:?}", json.content);
+
     Ok(json)
 }
 
@@ -101,9 +105,17 @@ fn walk(handle: Handle) -> Result<Handle, Error> {
 }
 
 fn inline_image(url: &str) -> Result<String, Error> {
+    let url = sanitize_image_url(url);
     let img = get_image(url)?;
     let buf = compress_image(img)?;
     Ok(base64::encode(&buf))
+}
+
+fn sanitize_image_url(url: &str) -> &str {
+    match url.split("%20").next() {
+        Some(url) => url,
+        None => url,
+    }
 }
 
 fn get_image(url: &str) -> Result<Vec<u8>, Error> {
