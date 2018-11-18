@@ -3,12 +3,12 @@ use failure::Error;
 use html5ever::{
     parse_document,
     rcdom::{Handle, NodeData::Element, RcDom},
-    serialize,
     tendril::{Tendril, TendrilSink},
 };
 use image;
 use reqwest::Client;
 use serde_json;
+use serializer::serialize;
 use std::io::Cursor;
 use std::str;
 

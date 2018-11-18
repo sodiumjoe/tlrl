@@ -6,6 +6,8 @@ extern crate serde_derive;
 extern crate hyper;
 #[macro_use]
 extern crate failure;
+#[macro_use]
+extern crate markup5ever;
 
 extern crate base64;
 extern crate chrono;
@@ -24,6 +26,7 @@ extern crate serde_json;
 mod configuration;
 mod email;
 mod parser;
+mod serializer;
 
 use clap::{App, Arg};
 use failure::Error;
