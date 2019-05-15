@@ -1,8 +1,6 @@
 tl;rl
 =====
 
-## SORRY, THIS IS BROKEN RIGHT NOW BECAUSE MERCURY API HAS SHUT DOWN. YOU CAN STILL GET IT TO WORK IF YOU RUN YOUR OWN MERCURY API INSTANCE (see https://github.com/postlight/mercury-parser)
-
 Send a web page to your kindle for reading later from the command line.
 
 ## Configuration
