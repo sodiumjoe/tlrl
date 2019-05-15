@@ -79,19 +79,21 @@ fn walk(handle: Handle) -> Result<Handle, Error> {
             ref name,
             ref attrs,
             ..
-        } => if name.local.eq_str_ignore_ascii_case("img") {
-            attrs.borrow_mut().iter_mut().for_each(|ref mut attr| {
-                if attr.name.local.eq_str_ignore_ascii_case("src") {
-                    match inline_image(attr.value.to_string().as_str()) {
-                        Ok(base64_img) => {
-                            let src = format!("data:image/jpeg;base64, {}", base64_img);
-                            attr.value = Tendril::from_slice(src.as_str());
+        } => {
+            if name.local.eq_str_ignore_ascii_case("img") {
+                attrs.borrow_mut().iter_mut().for_each(|ref mut attr| {
+                    if attr.name.local.eq_str_ignore_ascii_case("src") {
+                        match inline_image(attr.value.to_string().as_str()) {
+                            Ok(base64_img) => {
+                                let src = format!("data:image/jpeg;base64, {}", base64_img);
+                                attr.value = Tendril::from_slice(src.as_str());
+                            }
+                            Err(_) => {}
                         }
-                        Err(_) => {}
                     }
-                }
-            });
-        },
+                });
+            }
+        }
         _ => {}
     }
     let children: Result<Vec<_>, _> = node

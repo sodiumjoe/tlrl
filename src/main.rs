@@ -26,7 +26,6 @@ extern crate serde_json;
 mod configuration;
 mod email;
 mod parser;
-mod serializer;
 
 use clap::{App, Arg};
 use failure::Error;
@@ -44,13 +43,15 @@ fn main() -> Result<(), Error> {
                 .help("The url of the webpage.")
                 .required(true)
                 .index(1),
-        ).arg(
+        )
+        .arg(
             Arg::with_name("v")
                 .short("v")
                 .long("verbose")
                 .multiple(true)
                 .help("Sets the level of verbosity"),
-        ).get_matches();
+        )
+        .get_matches();
 
     let log_level = match matches.occurrences_of("v") {
         0 => "error",
