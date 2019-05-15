@@ -26,6 +26,7 @@ extern crate serde_json;
 mod configuration;
 mod email;
 mod parser;
+mod serializer;
 
 use clap::{App, Arg};
 use failure::Error;
@@ -69,7 +70,7 @@ fn main() -> Result<(), Error> {
         Configuration::new().map_err(|error| format_err!("Configuration error: {}", error))?;
     let url = matches.value_of("url").unwrap();
 
-    let doc = parser::parse(url, config.get_mercury_token())?;
+    let doc = parser::parse(url)?;
 
     send(doc, config.get_email_config())
 }

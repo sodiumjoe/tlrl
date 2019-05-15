@@ -7,7 +7,6 @@ pub struct Configuration {
     kindle_email: String,
     gmail_username: String,
     gmail_application_password: String,
-    mercury_token: String,
 }
 
 impl Configuration {
@@ -29,10 +28,6 @@ impl Configuration {
         info!("config: {:?}", logged_config);
 
         Ok(result)
-    }
-
-    pub fn get_mercury_token(&self) -> String {
-        self.mercury_token.to_owned()
     }
 
     pub fn get_email_config(self) -> EmailConfig {
