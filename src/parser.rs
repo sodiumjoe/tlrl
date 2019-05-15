@@ -10,11 +10,11 @@ use reqwest::Client;
 use serde_json;
 use serializer::serialize;
 use std::io::Cursor;
+use std::io::ErrorKind::NotFound;
+use std::process::Command;
 use std::str;
 
 header! { (XApiKey, "x-api-key") => [String] }
-
-const MERCURY_URL: &str = "https://mercury.postlight.com/parser";
 
 #[derive(Deserialize, Debug)]
 pub struct ParsedDocument {
@@ -26,25 +26,15 @@ pub struct ParsedDocument {
     pub url: Option<String>,
 }
 
-pub fn parse(uri: &str, key: String) -> Result<ParsedDocument, Error> {
-    let client = Client::builder().build()?;
+pub fn parse(uri: &str) -> Result<ParsedDocument, Error> {
+    let output = Command::new("mercury-parser").arg(uri).output().map_err(|err| {
+        match err.kind() {
+            NotFound => format_err!("Couldn't find executable `mercury-parser`. Make sure you've installed it and it's in your $PATH: https://github.com/postlight/mercury-parser"),
+            _ => format_err!("{}", err)
+        }
+    })?;
 
-    let mut request_uri = String::from(MERCURY_URL);
-    request_uri.push_str("?url=");
-    request_uri.push_str(uri);
-    debug!("{:?}", request_uri);
-
-    let mut req = client.get(request_uri.as_str());
-    req.header(XApiKey(key.to_string()));
-    let req_string = format!("{:?}", req).as_str().replace(&key, "[redacted]");
-    debug!("{}", req_string);
-    let mut res = req
-        .send()
-        .map_err(|err| format_err!("Error sending request to mercury api: {}", err))?;
-    debug!("response: {:?}", res);
-    let text = res
-        .text()
-        .map_err(|err| format_err!("Error getting text from mercury api response: {}", err))?;
+    let text = String::from_utf8(output.stdout)?;
     debug!("text: {:?}", text);
     let mut json: ParsedDocument = serde_json::from_str(text.as_str())
         .map_err(|err| format_err!("Error deserializing mercury api response json: {}", err))?;
@@ -79,19 +69,21 @@ fn walk(handle: Handle) -> Result<Handle, Error> {
             ref name,
             ref attrs,
             ..
-        } => if name.local.eq_str_ignore_ascii_case("img") {
-            attrs.borrow_mut().iter_mut().for_each(|ref mut attr| {
-                if attr.name.local.eq_str_ignore_ascii_case("src") {
-                    match inline_image(attr.value.to_string().as_str()) {
-                        Ok(base64_img) => {
-                            let src = format!("data:image/jpeg;base64, {}", base64_img);
-                            attr.value = Tendril::from_slice(src.as_str());
+        } => {
+            if name.local.eq_str_ignore_ascii_case("img") {
+                attrs.borrow_mut().iter_mut().for_each(|ref mut attr| {
+                    if attr.name.local.eq_str_ignore_ascii_case("src") {
+                        match inline_image(attr.value.to_string().as_str()) {
+                            Ok(base64_img) => {
+                                let src = format!("data:image/jpeg;base64, {}", base64_img);
+                                attr.value = Tendril::from_slice(src.as_str());
+                            }
+                            Err(_) => {}
                         }
-                        Err(_) => {}
                     }
-                }
-            });
-        },
+                });
+            }
+        }
         _ => {}
     }
     let children: Result<Vec<_>, _> = node

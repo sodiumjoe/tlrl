@@ -156,27 +156,28 @@ impl<Wr: Write> Serializer for HtmlSerializer<Wr> {
         }
         try!(self.writer.write_all(b">"));
 
-        let ignore_children = name.ns == ns!(html) && match name.local {
-            local_name!("area")
-            | local_name!("base")
-            | local_name!("basefont")
-            | local_name!("bgsound")
-            | local_name!("br")
-            | local_name!("col")
-            | local_name!("embed")
-            | local_name!("frame")
-            | local_name!("hr")
-            | local_name!("img")
-            | local_name!("input")
-            | local_name!("keygen")
-            | local_name!("link")
-            | local_name!("meta")
-            | local_name!("param")
-            | local_name!("source")
-            | local_name!("track")
-            | local_name!("wbr") => true,
-            _ => false,
-        };
+        let ignore_children = name.ns == ns!(html)
+            && match name.local {
+                local_name!("area")
+                | local_name!("base")
+                | local_name!("basefont")
+                | local_name!("bgsound")
+                | local_name!("br")
+                | local_name!("col")
+                | local_name!("embed")
+                | local_name!("frame")
+                | local_name!("hr")
+                | local_name!("img")
+                | local_name!("input")
+                | local_name!("keygen")
+                | local_name!("link")
+                | local_name!("meta")
+                | local_name!("param")
+                | local_name!("source")
+                | local_name!("track")
+                | local_name!("wbr") => true,
+                _ => false,
+            };
 
         self.parent().processed_first_child = true;
 

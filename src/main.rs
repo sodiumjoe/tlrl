@@ -44,13 +44,15 @@ fn main() -> Result<(), Error> {
                 .help("The url of the webpage.")
                 .required(true)
                 .index(1),
-        ).arg(
+        )
+        .arg(
             Arg::with_name("v")
                 .short("v")
                 .long("verbose")
                 .multiple(true)
                 .help("Sets the level of verbosity"),
-        ).get_matches();
+        )
+        .get_matches();
 
     let log_level = match matches.occurrences_of("v") {
         0 => "error",
@@ -68,7 +70,7 @@ fn main() -> Result<(), Error> {
         Configuration::new().map_err(|error| format_err!("Configuration error: {}", error))?;
     let url = matches.value_of("url").unwrap();
 
-    let doc = parser::parse(url, config.get_mercury_token())?;
+    let doc = parser::parse(url)?;
 
     send(doc, config.get_email_config())
 }

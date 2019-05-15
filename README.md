@@ -7,7 +7,7 @@ Send a web page to your kindle for reading later from the command line.
 
 ## Configuration
 
-1. [Get an api key for the Mercury API](https://mercury.postlight.com/web-parser/).
+1. [Install mercury-parser](https://github.com/postlight/mercury-parser).
 2. [Create an application-specific password for gmail](https://myaccount.google.com/apppasswords).
   * Select App -> Other (custom)
 3. Make sure you have a kindle email address set up.
@@ -23,7 +23,6 @@ Send a web page to your kindle for reading later from the command line.
 
 ```json
 {
-  "mercury_token":"from step 1",
   "gmail_application_password": "from step 2",
   "kindle_email": "from step 3",
   "gmail_username": "from step 4",
