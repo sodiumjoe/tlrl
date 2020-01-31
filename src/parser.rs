@@ -1,14 +1,12 @@
 use base64;
 use failure::Error;
-use html5ever::{
-    parse_document,
-    rcdom::{Handle, NodeData::Element, RcDom},
-    tendril::{Tendril, TendrilSink},
-};
+use html5ever::{ns, LocalName, QualName};
 use image;
+use kuchiki::{parse_html, traits::TendrilSink, Attribute, Attributes, ExpandedName, NodeRef};
 use reqwest::Client;
 use serde_json;
 use serializer::serialize;
+use std::collections::BTreeMap;
 use std::io::Cursor;
 use std::io::ErrorKind::NotFound;
 use std::process::Command;
@@ -48,52 +46,79 @@ pub fn parse(uri: &str) -> Result<ParsedDocument, Error> {
 }
 
 fn inline_images(input: String) -> Result<String, Error> {
-    let mut bytes = input.as_bytes();
+    let doc = parse_html().one(input);
 
-    let dom = parse_document(RcDom::default(), Default::default())
-        .from_utf8()
-        .read_from(&mut bytes)?;
-    let doc = walk(dom.document)?;
+    // inline base64 encoded image
+    for img in doc
+        .select("img")
+        .map_err(|err| format_err!("Error selecting img: {:?}", err))?
+    {
+        if let Some(element) = img.as_node().as_element() {
+            let mut attr = element.attributes.borrow_mut();
+            if let Some(src) = attr.get("src") {
+                let base64_img = inline_image(src)?;
+                let src = format!("data:image/jpeg;base64, {}", base64_img);
+                *attr = Attributes {
+                    map: BTreeMap::new(),
+                };
+                attr.insert("src", src);
+            }
+        }
+    }
+
+    // pull `img`s out of `picture`s and remove `picture` elements because kindle seems to do a
+    // weird thing with `picture`s where the content width gets narrower after each one.
+    for picture in doc
+        .select("picture")
+        .map_err(|err| format_err!("Error removing picture: {:?}", err))?
+    {
+        let picture_node = picture.as_node();
+        let img = picture_node
+            .select_first("img")
+            .map_err(|err| format_err!("Error selecting img {:?}", err))?;
+        if let Some(element) = img.as_node().as_element() {
+            let attr = element.attributes.borrow();
+            if let Some(src) = attr.get("src") {
+                let name = QualName::new(None, ns!(html), LocalName::from("img"));
+                let expanded_name = ExpandedName::new(ns!(), LocalName::from("src"));
+                let attr = Attribute {
+                    prefix: None,
+                    value: src.to_string(),
+                };
+                let attr = vec![(expanded_name, attr)];
+                let img = NodeRef::new_element(name, attr);
+                picture_node.insert_before(img);
+            }
+        }
+    }
+
+    let mut done = false;
+
+    while !done {
+        if let Ok(p) = doc.select_first("picture") {
+            p.as_node().detach();
+        } else {
+            done = true;
+        }
+    }
+
+    done = false;
+
+    // strip iframes
+    while !done {
+        if let Ok(p) = doc.select_first("iframe") {
+            p.as_node().detach();
+        } else {
+            done = true;
+        }
+    }
 
     let mut output = Vec::new();
     let _ = serialize(&mut output, &doc, Default::default())?;
+
     str::from_utf8(&output)
         .map(|s| s.into())
         .map_err(|err| format_err!("Error sending request to mercury api: {}", err))
-}
-
-fn walk(handle: Handle) -> Result<Handle, Error> {
-    let node = handle;
-    match node.data {
-        Element {
-            ref name,
-            ref attrs,
-            ..
-        } => {
-            if name.local.eq_str_ignore_ascii_case("img") {
-                attrs.borrow_mut().iter_mut().for_each(|ref mut attr| {
-                    if attr.name.local.eq_str_ignore_ascii_case("src") {
-                        match inline_image(attr.value.to_string().as_str()) {
-                            Ok(base64_img) => {
-                                let src = format!("data:image/jpeg;base64, {}", base64_img);
-                                attr.value = Tendril::from_slice(src.as_str());
-                            }
-                            Err(_) => {}
-                        }
-                    }
-                });
-            }
-        }
-        _ => {}
-    }
-    let children: Result<Vec<_>, _> = node
-        .children
-        .borrow()
-        .iter()
-        .map(|c| walk(c.clone()))
-        .collect();
-    children?;
-    Ok(node)
 }
 
 fn inline_image(url: &str) -> Result<String, Error> {

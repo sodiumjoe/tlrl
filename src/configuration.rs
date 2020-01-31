@@ -21,7 +21,6 @@ impl Configuration {
 
         let logged_config = Configuration {
             gmail_application_password: "[redacted]".into(),
-            mercury_token: "[redacted]".into(),
             ..result.clone()
         };
 
