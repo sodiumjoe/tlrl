@@ -7,9 +7,9 @@
   * [ ] kindle email
   * [ ] gmail username
   * [ ] gmail application password
-* [ ] config
-  * [ ] kindle email
-  * [ ] gmail username
-  * [ ] gmail application password
-* [ ] parse
-* [ ] send
+* [X] config
+  * [X] kindle email
+  * [X] gmail username
+  * [X] gmail application password
+* [X] parse
+* [X] send
