@@ -19,6 +19,16 @@ module.exports = {
     // The clean selectors will remove anything that matches from
     // the result
     clean: ['footer[class^="ArticleFooter__footer"]'],
+
+    transforms: {
+      noscript: ($node) => {
+        const $children = $node.children();
+
+        if ($children.length === 1 && $children.get(0).tagName === "img") {
+          return "figure";
+        }
+      },
+    },
   },
 
   date_published: {

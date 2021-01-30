@@ -2,10 +2,10 @@ const Mercury = require("@postlight/mercury-parser");
 const { JSDOM } = require("jsdom");
 const fetch = require("node-fetch");
 const sharp = require("sharp");
-const NYTimesExtractor = require("./extractors/nyt");
+const NewYorkerExtractor = require("./extractors/new-yorker");
 const WiredExtractor = require("./extractors/wired");
 
-Mercury.addExtractor(NYTimesExtractor);
+Mercury.addExtractor(NewYorkerExtractor);
 Mercury.addExtractor(WiredExtractor);
 
 const getBase64EncodedImg = async (src) => {
