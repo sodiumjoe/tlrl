@@ -22,11 +22,16 @@ const inlineImages = async (html) => {
   const dom = new JSDOM(html);
   const { window } = dom;
   for (const img of window.document.querySelectorAll("img")) {
-    const base64Img = await getBase64EncodedImg(img.src);
-    img.src = `data:image/jpeg;base64,${base64Img}`;
-    if (img.srcset) {
-      img.removeAttribute("srcset");
+    try {
+      const base64Img = await getBase64EncodedImg(img.src);
+      img.src = `data:image/jpeg;base64,${base64Img}`;
+      if (img.srcset) {
+        img.removeAttribute("srcset");
+      }
+    } catch (e) {
+      console.warn(`Skipping img: ${img.src}`);
     }
+    img.remove();
   }
   return dom.serialize();
 };
