@@ -20,7 +20,7 @@ const send = async (article) => {
     to: config.kindle,
     subject: "convert",
     text: "Sent from tl;rl",
-    attachments: [{ filename, content: new Buffer(content, "utf-8") }],
+    attachments: [{ filename, content: Buffer.from(content, "utf-8") }],
   };
 
   await transporter.sendMail(message);
