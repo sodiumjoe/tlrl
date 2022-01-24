@@ -19,7 +19,7 @@
   "dependencies": {
     "@postlight/mercury-parser": "^2.2.0",
     "jsdom": "^16.4.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "nodemailer": "^6.4.17",
     "sharp": "^0.28.0",
     "xdg-basedir": "^4.0.0",
